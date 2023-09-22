@@ -1,0 +1,42 @@
+exports_files(["llvm_ocaml.h"])
+
+package(default_visibility=["//visibility:public"])
+
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+ocaml_signature(
+    name = "Llvm_cmi",
+    src = "Llvm.mli",
+    opts = ["-w", "-unexpected-docstring"] # 50
+)
+
+ocaml_module(
+    name = "Llvm",
+    struct = "llvm.ml",
+    sig    = ":Llvm_cmi",
+    deps   = [":llvm_c"],
+)
+
+cc_library(
+    name = "llvm_c",
+    srcs = [
+        "llvm_ocaml.c",
+        "llvm_ocaml.h",
+        "@llvm_toolchain_llvm//:include",
+    ],
+    hdrs = ["llvm_ocaml.h"],
+    copts = [
+        # FIXME: undeclared fns 'failwith', 'alloc_custom',
+        # 'string_length', 'callback', 'remove_global_root'
+        "-Wno-implicit-function-declaration",
+
+        "-I$(@toolchains_llvm)/include",
+        "-I$(@ocaml)/lib/c",
+    ],
+    deps = ["@ocaml//lib/c:sdk"],
+    visibility = ["//visibility:public"],
+    toolchains = ["//:repo_paths"]
+)

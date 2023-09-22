@@ -1,0 +1,46 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Llvm_transform_utils_cmi",
+    src  = "llvm_transform_utils.mli",
+    deps = [
+        "//src/transforms/passmgr_builder:Llvm_passmgr_builder_cmi",
+        "//src/llvm:Llvm_cmi"
+    ]
+)
+
+ocaml_module(
+    name = "Llvm_transform_utils",
+    struct = "llvm_transform_utils.ml",
+    sig    = ":Llvm_transform_utils_cmi",
+    opts   = ["-w", "-labels-omitted"], # 6
+    deps   = [
+        "//src/llvm:Llvm",
+        "//src/target:Llvm_target",
+        ":transform_utils_c"
+    ],
+)
+
+cc_library(
+    name = "transform_utils_c",
+    srcs = [
+        "transform_utils_ocaml.c",
+        "@llvm_toolchain_llvm//:include",
+    ],
+    additional_compiler_inputs = [
+        "@llvm_toolchain_llvm//:include",
+    ],
+    copts = [
+        "-I$(@toolchains_llvm)/include",
+        "-I$(@ocaml)/lib/c",
+    ],
+    deps = ["@ocaml//lib/c:sdk"
+    ],
+    visibility = ["//visibility:public"],
+    toolchains = ["//:repo_paths"]
+)

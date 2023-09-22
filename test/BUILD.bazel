@@ -1,0 +1,53 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+test_suite(
+    name = "test",
+    tests = [":builds", "clibs"])
+
+build_test(
+    name = "builds",
+    targets = [
+        "//src/all_backends:Llvm_all_backends",
+        "//src/analysis:Llvm_analysis",
+        # "//src/backends:Llvm_backend", # not yet
+        "//src/bitreader:Llvm_bitreader",
+        "//src/bitwriter:Llvm_bitwriter",
+        "//src/debuginfo:Llvm_debuginfo",
+        "//src/executionengine:Llvm_executionengine",
+        "//src/irreader:Llvm_irreader",
+        "//src/linker:Llvm_linker",
+        "//src/llvm:Llvm",
+        "//src/target:Llvm_target",
+        "//src/transforms/ipo:Llvm_ipo",
+        "//src/transforms/passmgr_builder:Llvm_passmgr_builder",
+        "//src/transforms/scalar_opts:Llvm_scalar_opts",
+        "//src/transforms/utils:Llvm_transform_utils",
+        "//src/transforms/vectorize:Llvm_vectorize",
+        ]
+)
+
+## NB: clib deps of ocaml_module are not built
+## until they are needed for linking, so we build
+## them separately here.
+
+build_test(
+    name = "clibs",
+    targets = [
+        "//src/all_backends:all_backends_c",
+        "//src/analysis:analysis_c",
+        "//src/backends:backend_c",
+        "//src/bitreader:bitreader_c",
+        "//src/bitwriter:bitwriter_c",
+        "//src/debuginfo:debuginfo_c",
+        "//src/executionengine:executionengine_c",
+        "//src/irreader:irreader_c",
+        "//src/linker:linker_c",
+        "//src/llvm:llvm_c",
+        "//src/target:target_c",
+        "//src/transforms/ipo:ipo_c",
+        "//src/transforms/passmgr_builder:passmgr_builder_c",
+        "//src/transforms/scalar_opts:scalar_opts_c",
+        "//src/transforms/utils:transform_utils_c",
+        "//src/transforms/vectorize:vectorize_c",
+        ]
+)

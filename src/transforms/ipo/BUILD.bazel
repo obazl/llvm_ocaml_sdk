@@ -1,0 +1,43 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Llvm_ipo_cmi",
+    src = "Llvm_ipo.mli",
+    deps   = [
+        "//src/transforms/passmgr_builder:Llvm_passmgr_builder",
+    ]
+)
+
+ocaml_module(
+    name = "Llvm_ipo",
+    struct = "llvm_ipo.ml",
+    sig    = "Llvm_ipo_cmi",
+    deps   = [
+        "//src/llvm:Llvm",
+        "//src/target:Llvm_target",
+    ],
+    cc_deps = [":ipo_c"]
+)
+
+cc_library(
+    name = "ipo_c",
+    srcs = [
+        "ipo_ocaml.c",
+        "@llvm_toolchain_llvm//:include",
+    ],
+    additional_compiler_inputs = [
+        "@llvm_toolchain_llvm//:include",
+    ],
+    copts = [
+        "-I$(@toolchains_llvm)/include",
+        "-I$(@ocaml)/lib/c",
+    ],
+    deps = ["@ocaml//lib/c:sdk"],
+    visibility = ["//visibility:public"],
+    toolchains = ["//:repo_paths"]
+)

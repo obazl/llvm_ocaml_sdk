@@ -1,0 +1,60 @@
+= ocaml-llvm
+llvm bindings for OCaml (Bazelized)
+
+WARNING: Experimental. Used solely for developing a Bazel
+build of the bindings.
+
+The source in this repo was copied from the
+link:https://github.com/llvm/llvm-project/tree/main/llvm/bindings/ocaml[llvm-project],
+so it is not kept up to date. The subdirectorys of `llvm/bindings/ocaml` are under `src/`.
+
+NOTE: Status as of Sept 22, 2023: each subdir in `src/` has a
+`BUILD.bazel` file; most targets build on MacOS 13.5.2. Not tested on
+Linux yet. No testsuite. **Will not work for you** - the build depends
+on the configuration of my local workstation, because some of the
+elements (such as Bazel/OPAM integration) involved are still under
+development. I expect to publish the stuff in the next few weeks, at
+which point I'll add more detailed information here; until then,
+you'll have to settle for reading the (Bazel) code, which fortunately
+is very simple.
+
+== notes
+
+Targets that depend on CMake `configure_file` do not build. In general
+Bazel can handle stuff like that (unless it involves platform feature
+detection); I just haven't gotten to it yet. Example: `src/backends`.
+It depends on `LLVM_TARGETS_TO_BUILD` which is set in some manner by
+the root CMake build program. Evidently it takes values like "Native",
+"X86", "AArch64", etc. Configuring Bazel to support
+various targets will be relatively trivia, but that's a task for
+later.
+
+
+The llvm toolchain
+(link:https://github.com/grailbio/bazel-toolchain[grailbio/bazel-toolchain])
+works automagically - no need to download, install configure. Bazel
+handles all that automatically.
+
+However, it did not work out of the box for this project, because it
+is C++-centric. That is, Bazel made it available, but it is not
+configured for C development. So I had to tweak it to expose the C
+headers in `llvm/include/llvm-c`; fortunately this was very simple
+(though admittedly it would be a show-stopper for somebody unfamiliar
+with Bazel).
+
+The META stuff is ignored. That's all about OPAM installation, which
+will be handled by Bazel in its own way. For now the goal is just to build the stuff.
+
+== resources
+
+link:https://github.com/grailbio/bazel-toolchain[grailbio/bazel-toolchain]
+is a Bazel module that constructs Bazel toolchains for pre-compiled
+llvm compilers (which it downloads).  This is what is used by this repo.
+
+The link:https://github.com/llvm/llvm-project/tree/main[llvm-project]
+supports Bazel builds via unofficial Bazel code at
+link:https://github.com/llvm/llvm-project/tree/main/utils/bazel[llvm-project/tree/main/utils/bazel].
+I have not worked with this.
+
+link:https://github.com/google/llvm-bazel[llvm-bazel] is an obsolete
+project, superceded by the above, but possibly still of interest.

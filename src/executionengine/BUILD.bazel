@@ -1,0 +1,48 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Llvm_executionengine_cmi",
+    src = "llvm_executionengine.mli",
+    opts = ["-w", "-unexpected-docstring"], # 50
+    deps = [
+        "@ctypes//lib/ctypes",
+        "//src/target:Llvm_target_cmi"
+    ]
+)
+
+ocaml_module(
+    name = "Llvm_executionengine",
+    struct = "llvm_executionengine.ml",
+    sig    = ":Llvm_executionengine_cmi",
+    opts   = ["-w", "-labels-omitted"], # 6
+    deps   = [
+        "@ctypes//lib/ctypes",
+        "//src/llvm:Llvm",
+        "//src/target:Llvm_target",
+        ":executionengine_c"
+    ],
+)
+
+cc_library(
+    name = "executionengine_c",
+    srcs = [
+        "executionengine_ocaml.c",
+        "@llvm_toolchain_llvm//:include",
+    ],
+    additional_compiler_inputs = [
+        "@llvm_toolchain_llvm//:include",
+    ],
+    copts = [
+        "-I$(@toolchains_llvm)/include",
+        "-I$(@ocaml)/lib/c",
+    ],
+    deps = ["@ocaml//lib/c:sdk"
+    ],
+    visibility = ["//visibility:public"],
+    toolchains = ["//:repo_paths"]
+)
