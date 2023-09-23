@@ -8,62 +8,144 @@ load(
     "ocaml_test",
 )
 
+TEST_OPTS = [
+    "-cclib", "-lm",
+    "-cclib", "-lz",
+    "-cclib", "-lstdc++",
+    "-cclib", "-lcurses",
+    "-ccopt", "/opt/homebrew/lib/libzstd.1.5.5.dylib",
+    # "-verbose",
+    # "-ccopt", "-Wl,-v", ## pass verbose to assembler
+]
+
 test_suite(
     name = "test",
     tests = [":builds", "clibs"]
 )
 
+###########
 ocaml_test(
-    name = "analysis",
-    main = "Analysis",
-    cc_deps = {
-        "//src/analysis:analysis_c": "static",
-        "//src/llvm:llvm_c": "static"
-    },
-    opts = [
-        "-verbose",
-        "-ccopt", "-Wl,-v", ## pass verbose to assembler
-
-        "-ccopt",
-        "-Lexternal/toolchains_llvm~override~llvm~llvm_toolchain_llvm/lib",
-        "-cclib", "-lm",
-        "-cclib", "-lz",
-        "-cclib", "-lstdc++",
-        "-cclib", "-lcurses",
-        "-cclib", "-lxml2",
-        # "-cclib", "-lLTO",
-        # "-cclib", "-lRemarks",
-        # "-cclib", "-lclang-cpp",
-
-        "-ccopt", "/opt/homebrew/lib/libzstd.1.5.5.dylib",
-
-        # "-cclib",  "-lLLVMCore.a",
-        # "-cclib", "-lLLVMRemarks",
-        # "-cclib", "-lLLVMBitstreamReader",
-        # "-cclib", "-lLLVMBinaryFormat",
-        # "-cclib", "-lLLVMTargetParser",
-        # "-cclib", "-lLLVMSupport",
-        # "-cclib", "-lLLVMDemangle"
-    ],
-    toolchains = ["//:repo_paths"]
+    name = "analysis_test",
+    main = ":Analysis",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
 )
 
 ocaml_module(
     name = "Analysis",
     struct = "analysis.ml",
-    deps   = [
-        "//src/analysis:Llvm_analysis",
-        "//src/llvm:Llvm"
-        # ":analysis_c"
-    ],
-    cc_deps = {"//src/llvm:llvm_c": "static"},
-    data = ["@llvm_toolchain_llvm//:include"],
-    opts = [
-        "-w", "+A-27-70",
-    ],
+    deps   = ["//src/analysis:Llvm_analysis"],
+    opts = ["-w", "+A-27-70"],
 )
 
+###########
+ocaml_test(
+    name = "bitreader_test",
+    args = ["bitcode.bc"],
+    main = ":Bitreader",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
 
+ocaml_module(
+    name = "Bitreader",
+    struct = "bitreader.ml",
+    deps   = ["//src/bitreader:Llvm_bitreader",
+              "//src/bitwriter:Llvm_bitwriter"])
+
+###########
+ocaml_test(
+    name = "bitwriter_test",
+    args = ["bitcode.bc"],
+    main = ":Bitwriter",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
+
+ocaml_module(
+    name = "Bitwriter",
+    struct = "bitwriter.ml",
+    deps   = ["//src/bitreader:Llvm_bitreader",
+              "//src/bitwriter:Llvm_bitwriter"])
+
+###########
+ocaml_test(
+    name = "core_test",
+    args = ["bitcode.bc"],
+    main = ":Core",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
+
+ocaml_module(
+    name = "Core",
+    struct = "core.ml",
+    deps   = ["//src/analysis:Llvm_analysis",
+              "//src/bitwriter:Llvm_bitwriter",
+              "//test/Utils:Testsuite"])
+
+###########
+ocaml_test(
+    name = "debuginfo_test",
+    # args = ["bitcode.bc"],
+    main = ":Debuginfo",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
+
+ocaml_module(
+    name = "Debuginfo",
+    struct = "debuginfo.ml",
+    deps   = ["//src/all_backends:Llvm_all_backends",
+              "//src/target:Llvm_target",
+              "//src/analysis:Llvm_analysis",
+              "//src/debuginfo:Llvm_debuginfo",
+              "//test/Utils:Testsuite"]
+)
+
+###########
+ocaml_test(
+    name = "passmgr_builder_test",
+    args = ["bitcode.bc"],
+    main = ":Passmgr_builder",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
+
+ocaml_module(
+    name = "Passmgr_builder",
+    struct = "passmgr_builder.ml",
+    deps   = [
+        "//src/transforms/passmgr_builder:Llvm_passmgr_builder"
+    ]
+)
+
+###########
+ocaml_test(
+    name = "scalar_opts_test",
+    # args = ["bitcode.bc"],
+    main = ":Scalar_Opts",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
+
+ocaml_module(
+    name = "Scalar_opts",
+    struct = "scalar_opts.ml",
+    deps   = [
+        "//src/transforms/passmgr_builder:Llvm_passmgr_builder",
+        "//src/transforms/scalar_opts:Llvm_scalar_opts"
+    ]
+)
+
+################################
 build_test(
     name = "builds",
     targets = [

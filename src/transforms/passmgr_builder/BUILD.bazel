@@ -27,6 +27,7 @@ cc_library(
     srcs = [
         "passmgr_builder_ocaml.c",
         "@llvm_toolchain_llvm//:include",
+        "@llvm_toolchain_llvm//lib:passes-libs",
     ],
     additional_compiler_inputs = [
         "@llvm_toolchain_llvm//:include",
@@ -38,7 +39,8 @@ cc_library(
         "-I$(@toolchains_llvm)/include",
         "-I$(@ocaml)/lib/c",
     ],
-    deps = ["@ocaml//lib/c:sdk"
+    deps = [
+        "@ocaml//lib/c:sdk",
     ],
     visibility = ["//visibility:public"],
     toolchains = ["//:repo_paths"]

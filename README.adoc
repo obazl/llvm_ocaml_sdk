@@ -49,7 +49,9 @@ No testsuite atm, only a simple build test targets that verify the builds succee
 
 == resources
 
-link:https://github.com/paulsmith/getting-started-llvm-c-api[Getting started with the LLVM C AP]
+link:https://www.pauladamsmith.com/blog/2015/01/how-to-get-started-with-llvm-c-api.html[How to get started with the LLVM C API] (2015)
+
+link:https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html[My First Language Frontend with LLVM Tutorial] (Kaleidoscope)
 
 link:https://bazel.build/external/module[Bazel modules]
 
