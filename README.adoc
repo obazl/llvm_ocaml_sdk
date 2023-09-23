@@ -11,7 +11,7 @@ so it is not kept up to date. The subdirectories of
 
 NOTE: Status as of Sept 22, 2023: each subdir in `src/` has a
 `BUILD.bazel` file; most targets build on MacOS 13.5.2. Not tested on
-Linux yet. No testsuite. **Will not work for you** - the build depends
+Linux yet.  **Will not work for you** - the build depends
 on the configuration of my local workstation, because some of the
 elements (such as Bazel/OPAM integration) involved are still under
 development. I expect to publish the stuff in the next few weeks, at
@@ -38,6 +38,14 @@ with Bazel).
 
 The META stuff is ignored. That's all about OPAM installation, which
 will be handled by Bazel in its own way. For now the goal is just to build the stuff.
+
+== testing
+
+No testsuite atm, only a simple build test targets that verify the builds succeed:
+
+    $ bazel test test
+
+(in `test/BUILD.bazel`)
 
 == resources
 
