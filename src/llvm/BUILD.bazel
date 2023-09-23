@@ -26,6 +26,48 @@ cc_library(
         "llvm_ocaml.c",
         "llvm_ocaml.h",
         "@llvm_toolchain_llvm//:include",
+    # dune:
+# cd _build/static && /home/me/.opam/5.1.0/bin/ocamlmklib -g -o llvm/llvm_stubs llvm/llvm_ocaml.o -ldopt '-L/home/me/llvm-project/builddune/lib  -lstdc++ -fPIC -lLLVMCore -lLLVMRemarks -lLLVMBitstreamReader -lLLVMBinaryFormat -lLLVMTargetParser -lLLVMSupport -lLLVMDemangle'
+
+        "@llvm_toolchain_llvm//:lib/libLLVMCore.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMXCoreDesc.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMRemarks.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMBitstreamReader.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMBitReader.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMBitWriter.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMBinaryFormat.a",
+        # "@llvm_toolchain_llvm//:lib/libLLVMTargetParser.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMSupport.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMAnalysis.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMDebugInfoDWARF.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMDebugInfoGSYM.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMSymbolize.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMObject.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMExegesis.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMMC.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMMCParser.a",
+
+        "@llvm_toolchain_llvm//:lib/libLLVMAsmPrinter.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMARMAsmParser.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMARMCodeGen.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMARMDesc.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMARMDisassembler.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMARMInfo.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMARMUtils.a",
+
+        "@llvm_toolchain_llvm//:lib/libLLVMTextAPI.a",
+        "@llvm_toolchain_llvm//:lib/liblldMachO.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMProfileData.a",
+        "@llvm_toolchain_llvm//:lib/libLLVMDemangle.a",
+        # "@llvm_toolchain_llvm//:lib/libLLVMCoreCodeGen.a",
+        # "@llvm_toolchain_llvm//:lib/libLLVMCoreInfo.a",
+
+# "@llvm_toolchain_llvm//:lib/libLLVMAArch64Disassembler",
+# "@llvm_toolchain_llvm//:lib/libLLVMAArch64AsmParser",
+# "@llvm_toolchain_llvm//:lib/libLLVMAArch64CodeGen",
+# "@llvm_toolchain_llvm//:lib/libLLVMAArch64Desc",
+# "@llvm_toolchain_llvm//:lib/libLLVMAArch64Utils",
+# "@llvm_toolchain_llvm//:lib/libLLVMAArch64Info"
     ],
     hdrs = ["llvm_ocaml.h"],
     copts = [
@@ -36,7 +78,16 @@ cc_library(
         "-I$(@toolchains_llvm)/include",
         "-I$(@ocaml)/lib/c",
     ],
-    deps = ["@ocaml//lib/c:sdk"],
+    local_defines = [
+        "__STDC_CONSTANT_MACROS",
+        "__STDC_FORMAT_MACROS",
+        "__STDC_LIMIT_MACROS"
+    ],
+    # llvm linker flags (llvm-config --ldflags):
+    # -Wl,-search_paths_first -Wl,-headerpad_max_install_names
+    deps = [
+        "@ocaml//lib/c:sdk",
+    ],
     visibility = ["//visibility:public"],
     toolchains = ["//:repo_paths"]
 )

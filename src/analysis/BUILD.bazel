@@ -19,10 +19,6 @@ ocaml_module(
         "//src/llvm:Llvm",
         ":analysis_c"
     ],
-    opts = [
-        "-verbose",
-        "-ccopt", "-Wl,-v"
-    ],
 )
 
 cc_library(
@@ -31,6 +27,7 @@ cc_library(
         "analysis_ocaml.c",
         "//src/llvm:llvm_ocaml.h",
         "@llvm_toolchain_llvm//:include",
+        # "@llvm_toolchain_llvm//:lib/libLLVMAnalysis.a",
     ],
     copts = [
         # FIXME: undeclared fn 'copy_string'

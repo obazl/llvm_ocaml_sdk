@@ -1,8 +1,68 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
+load(
+    "@rules_ocaml//build:rules.bzl",
+    "ocaml_archive",
+    "ocaml_binary",
+    "ocaml_module",
+    "ocaml_test",
+)
+
 test_suite(
     name = "test",
-    tests = [":builds", "clibs"])
+    tests = [":builds", "clibs"]
+)
+
+ocaml_test(
+    name = "analysis",
+    main = "Analysis",
+    cc_deps = {
+        "//src/analysis:analysis_c": "static",
+        "//src/llvm:llvm_c": "static"
+    },
+    opts = [
+        "-verbose",
+        "-ccopt", "-Wl,-v", ## pass verbose to assembler
+
+        "-ccopt",
+        "-Lexternal/toolchains_llvm~override~llvm~llvm_toolchain_llvm/lib",
+        "-cclib", "-lm",
+        "-cclib", "-lz",
+        "-cclib", "-lstdc++",
+        "-cclib", "-lcurses",
+        "-cclib", "-lxml2",
+        # "-cclib", "-lLTO",
+        # "-cclib", "-lRemarks",
+        # "-cclib", "-lclang-cpp",
+
+        "-ccopt", "/opt/homebrew/lib/libzstd.1.5.5.dylib",
+
+        # "-cclib",  "-lLLVMCore.a",
+        # "-cclib", "-lLLVMRemarks",
+        # "-cclib", "-lLLVMBitstreamReader",
+        # "-cclib", "-lLLVMBinaryFormat",
+        # "-cclib", "-lLLVMTargetParser",
+        # "-cclib", "-lLLVMSupport",
+        # "-cclib", "-lLLVMDemangle"
+    ],
+    toolchains = ["//:repo_paths"]
+)
+
+ocaml_module(
+    name = "Analysis",
+    struct = "analysis.ml",
+    deps   = [
+        "//src/analysis:Llvm_analysis",
+        "//src/llvm:Llvm"
+        # ":analysis_c"
+    ],
+    cc_deps = {"//src/llvm:llvm_c": "static"},
+    data = ["@llvm_toolchain_llvm//:include"],
+    opts = [
+        "-w", "+A-27-70",
+    ],
+)
+
 
 build_test(
     name = "builds",

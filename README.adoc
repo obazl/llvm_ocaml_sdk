@@ -49,6 +49,8 @@ No testsuite atm, only a simple build test targets that verify the builds succee
 
 == resources
 
+link:https://github.com/paulsmith/getting-started-llvm-c-api[Getting started with the LLVM C AP]
+
 link:https://bazel.build/external/module[Bazel modules]
 
 link:https://github.com/obazl/rules_ocaml[rules_ocaml] - latest is on the 'dev' branch.
