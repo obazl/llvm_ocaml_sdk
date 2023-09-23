@@ -6,7 +6,8 @@ build of the bindings.
 
 The source in this repo was copied from the
 link:https://github.com/llvm/llvm-project/tree/main/llvm/bindings/ocaml[llvm-project],
-so it is not kept up to date. The subdirectorys of `llvm/bindings/ocaml` are under `src/`.
+so it is not kept up to date. The subdirectories of
+`llvm/bindings/ocaml` are under `src/`.
 
 NOTE: Status as of Sept 22, 2023: each subdir in `src/` has a
 `BUILD.bazel` file; most targets build on MacOS 13.5.2. Not tested on
@@ -20,19 +21,12 @@ is very simple.
 
 == notes
 
-Targets that depend on CMake `configure_file` do not build. In general
-Bazel can handle stuff like that (unless it involves platform feature
-detection); I just haven't gotten to it yet. Example: `src/backends`.
-It depends on `LLVM_TARGETS_TO_BUILD` which is set in some manner by
-the root CMake build program. Evidently it takes values like "Native",
-"X86", "AArch64", etc. Configuring Bazel to support
-various targets will be relatively trivia, but that's a task for
-later.
-
+The OCaml module in `src/backends` does not build, because it depends
+on CMake `configure_file` processing that I have not ported yet.
 
 The llvm toolchain
 (link:https://github.com/grailbio/bazel-toolchain[grailbio/bazel-toolchain])
-works automagically - no need to download, install configure. Bazel
+works automagically - no need to download, install, configure. Bazel
 handles all that automatically.
 
 However, it did not work out of the box for this project, because it
@@ -46,6 +40,12 @@ The META stuff is ignored. That's all about OPAM installation, which
 will be handled by Bazel in its own way. For now the goal is just to build the stuff.
 
 == resources
+
+link:https://bazel.build/external/module[Bazel modules]
+
+link:https://github.com/obazl/rules_ocaml[rules_ocaml] - latest is on the 'dev' branch.
+
+link:https://github.com/obazl/coswitch/tree/dev[coswitch] will give you some idea of how OPAM/Bazel integration is achieved.
 
 link:https://github.com/grailbio/bazel-toolchain[grailbio/bazel-toolchain]
 is a Bazel module that constructs Bazel toolchains for pre-compiled
