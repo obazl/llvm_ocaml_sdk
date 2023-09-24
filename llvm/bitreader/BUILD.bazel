@@ -1,0 +1,38 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Bitreader_cmi",
+    src = "Llvm_bitreader.mli",
+    opts = ["-w", "-unexpected-docstring"], # 50
+    deps = ["//llvm/llvm:Llvm_cmi"]
+)
+
+ocaml_module(
+    name = "Bitreader",
+    struct = "llvm_bitreader.ml",
+    sig    = "Bitreader_cmi",
+    deps   = ["//llvm/llvm:Llvm",
+              ":bitreader_c"],
+)
+
+cc_library(
+    name = "bitreader_c",
+    srcs = [
+        "bitreader_ocaml.c",
+    ],
+    copts = [
+        "-I$(@toolchains_llvm)/include",
+        "-I$(@ocaml)/lib/c",
+    ],
+    deps = [
+        "@llvm_toolchain_llvm//include:llvm-c",
+        "@llvm_toolchain_llvm//lib:bitreader-libs",
+        "@ocaml//lib/c:sdk"
+    ],
+    toolchains = ["//:repo_paths"]
+)

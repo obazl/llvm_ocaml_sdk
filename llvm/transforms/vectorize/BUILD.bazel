@@ -1,0 +1,38 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Vectorize_cmi",
+    src  = "llvm_vectorize.mli",
+    deps = [
+        "//llvm/transforms/passmgr_builder:Passmgr_builder_cmi",
+        "//llvm/llvm:Llvm_cmi"
+    ]
+)
+
+ocaml_module(
+    name = "Vectorize",
+    struct = "llvm_vectorize.ml",
+    sig    = ":Vectorize_cmi",
+    # opts   = ["-w", "-labels-omitted"], # 6
+    deps   = [
+        "//llvm/llvm:Llvm",
+        "//llvm/target:Target",
+        ":vectorize_c"
+    ],
+)
+
+cc_library(
+    name = "vectorize_c",
+    srcs = ["vectorize_ocaml.c"],
+    copts = ["-I$(@toolchains_llvm)/include",
+             "-I$(@ocaml)/lib/c"],
+    deps = ["@llvm_toolchain_llvm//include:llvm-c",
+            "@llvm_toolchain_llvm//lib:vectorize-libs",
+            "@ocaml//lib/c:sdk"],
+    toolchains = ["//:repo_paths"]
+)
