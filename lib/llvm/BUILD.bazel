@@ -1,0 +1,43 @@
+exports_files(["llvm_ocaml.h"])
+
+package(default_visibility=["//visibility:public"])
+
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+load("//:CONFIG.bzl", "LLVM_DEFINES", "LLVM_LINKOPTS")
+
+ocaml_signature(
+    name = "Llvm_cmi",
+    src = "Llvm.mli",
+    opts = ["-w", "-unexpected-docstring"] # 50
+)
+
+ocaml_module(
+    name = "Llvm",
+    struct = "llvm.ml",
+    sig    = ":Llvm_cmi",
+    deps   = [":llvm_c"],
+)
+
+cc_library(
+    name = "llvm_c",
+    srcs = [
+        "llvm_ocaml.c",
+    ],
+    hdrs = ["llvm_ocaml.h"],
+    copts = [
+        "-I$(@llvm_c_sdk)/include",
+        "-I$(@ocaml)/lib/sdk",
+    ],
+    local_defines = LLVM_DEFINES,
+    linkopts = LLVM_LINKOPTS,
+    deps = [
+        "@llvm_c_sdk//include",
+        "@ocaml//lib/sdk",
+    ],
+    visibility = ["//visibility:public"],
+    toolchains = ["//:repo_paths"]
+)

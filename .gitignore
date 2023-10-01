@@ -1,3 +1,5 @@
+llvm-*
+
 #### bazel gitignore ####
 .bazelignore
 .bazeliskrc
@@ -5,6 +7,8 @@
 .bazel
 bazel-*
 *.gz
+obsolete
+lib/llvm/obsolete
 
 #### ocaml gitignore ####
 *.annot

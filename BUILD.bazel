@@ -1,7 +1,7 @@
 load("@cc_config//:MACROS.bzl", "repo_paths")
 
 PROD_REPOS = [
-    "@llvm_toolchain_llvm//:include",
+    "@llvm_c_sdk//version",
     "@ocaml//version"
 ]
 

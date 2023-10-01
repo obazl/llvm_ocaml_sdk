@@ -49,14 +49,24 @@ No testsuite atm, only a simple build test targets that verify the builds succee
 
 == resources
 
+link:https://www.infoworld.com/article/3247799/what-is-llvm-the-power-behind-swift-rust-clang-and-more.html#:~:text=LLVM%20is%20a%20compiler%20framework,2023%202%3A00%20am%20PDT[What is LLVM? The power behind Swift, Rust, Clang, and more] Infoworld, Aug 2023
+
 link:https://alan-j-hu.github.io/writing/llvm-ocaml.html[Pointers
 Opaque, Pointers Naked] "Contributing to the OCaml bindings to LLVM" (March 6, 2023)
 
+link:https://github.com/alan-j-hu/llvm-dune[llvm-dune]
+
+link:https://arstechnica.com/information-technology/2014/05/apple-integrates-llvm-compiler-to-boost-webkit-javascript-performance/[Apple integrates LLVM compiler to boost WebKit JavaScript performance] - embedding llvm in a host application
+
 link:https://www.pauladamsmith.com/blog/2015/01/how-to-get-started-with-llvm-c-api.html[How to get started with the LLVM C API] (2015)
+
+link:https://www.owenstephens.co.uk/blog/2018/09/25/getting-started-with-the-newer-llvm-c-api.html[Getting started with the (recent) LLVM C JIT API] update to paul smith's demo (2018)
 
 link:https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html[My First Language Frontend with LLVM Tutorial] (Kaleidoscope)
 
 link:https://jonathan2251.github.io/lbd/[Tutorial: Creating an LLVM Backend for the Cpu0 Architecture]
+
+link:https://medium.com/@mshockwave/using-llvm-lit-out-of-tree-5cddada85a78[Using LLVM LIT Out-Of-Tree]
 
 link:https://bazel.build/external/module[Bazel modules]
 
@@ -75,3 +85,4 @@ I have not worked with this.
 
 link:https://github.com/google/llvm-bazel[llvm-bazel] is an obsolete
 project, superceded by the above, but possibly still of interest.
+

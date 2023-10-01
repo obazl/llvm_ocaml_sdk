@@ -1,0 +1,42 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature"
+)
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Irreader_cmi",
+    src = "llvm_irreader.mli",
+    deps   = ["//lib/llvm:Llvm"]
+)
+
+ocaml_module(
+    name = "Irreader",
+    struct = "llvm_irreader.ml",
+    sig    = ":Irreader_cmi",
+    deps   = [
+        "//lib/llvm:Llvm",
+        "//lib/target:Target",
+        ":irreader_c"
+    ],
+)
+
+cc_library(
+    name = "irreader_c",
+    srcs = ["irreader_ocaml.c"],
+    copts = [
+        "-I$(@llvm_c_sdk)/include",
+        "-I$(@ocaml)/lib/sdk",
+        "-I$(@)/lib/llvm"
+    ],
+    deps = [
+        "@ocaml//lib/sdk",
+        "@llvm_c_sdk//include",
+        "@llvm_c_sdk//lib:LLVMAsmParser",
+        "@llvm_c_sdk//lib:LLVMIRReader",
+        "@llvm_c_sdk//lib:target-libs",
+        "//lib/llvm:llvm_c"
+    ],
+    toolchains = ["//:repo_paths"]
+)

@@ -1,58 +1,45 @@
+LLVM_VERSION = "15.0.7"
 module(
     name = "ocaml-llvm",
-    version = "0.0.0",
-    compatibility_level = 0,
+    version = "1.0.0",
+    compatibility_level = 1,
     bazel_compatibility = [">=6.0.0"]
 )
-ocaml_llvm = use_extension("//:EXTENSIONS.bzl",
-                           "ocaml_llvm")
-# always make all targets available; choice of
-# which to use is configured at build time:
-ocaml_llvm.config(targets = ["ALL"])
-use_repo(ocaml_llvm, "llvm_config")
-
 
 bazel_dep(name = "platforms",    version = "0.0.7")
+bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 bazel_dep(name = "cc_config",    version = "1.0.0")
 
-bazel_dep(name = "rules_ocaml",  version = "1.0.0")
+bazel_dep(name = "llvm", version = "1.0.0")
+# local_path_override(
+#     module_name = "llvm",
+#     path = "..",
+# )
+
+llvm_config = use_extension(
+    "@llvm//:EXTENSIONS.bzl",
+    "llvm_config"
+)
+# required: llvm_config.llvm
+# optional: llvm_config.c_sdk
+
+llvm_config.llvm(
+    version   = LLVM_VERSION,
+    llvm_root = "@@//.config/llvm:root"
+)
+use_repo(llvm_config, "llvm_config")
+
+llvm_config.c_sdk()
+use_repo(llvm_config, "llvm_c_sdk")
 
 bazel_dep(name = "obazl",           version = "1.0.0",
           dev_dependency = True)
 
+bazel_dep(name = "rules_ocaml",  version = "1.0.0")
 bazel_dep(name = "ocaml", version = "0.0.0")
 register_toolchains("@ocaml//toolchain/selectors/local:all")
 register_toolchains("@ocaml//toolchain/profiles:all")
-
-bazel_dep(name = "toolchains_llvm", version = "0.10.3")
-local_path_override(
-    module_name = "toolchains_llvm",
-    path = "/Users/gar/obazl/llvm-bazel-toolchain"
-)
-
-# To directly use a commit from GitHub, replace commit with the commit you want.
-# Otherwise, omit this block.
-# git_override(
-#   module_name = "toolchains_llvm",
-#   commit = "42e0b400fe316797657ccc5d7d2f9bb6f13071d8",
-#   remote = "https://github.com/grailbio/bazel-toolchain",
-# )
-
-# Configure and register the toolchain.
-llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
-llvm.toolchain(
-    llvm_version = "15.0.0",
-    # llvm_version = "16.0.0",
-    # llvm_version = "16.0.5",
-    # targets = ["ALL"]
-)
-
-# use_repo(llvm, "llvm_toolchain")
-# register_toolchains("@llvm_toolchain//:all")
-
-use_repo(llvm, "llvm_toolchain_llvm")
-register_toolchains("@llvm_toolchain_llvm//:all")
 
 bazel_dep(name = "ctypes", version = "0.0.0")
 bazel_dep(name = "ctypes-foreign", version = "0.0.0")

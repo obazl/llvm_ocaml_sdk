@@ -1,0 +1,34 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature")
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Passmgr_builder_cmi",
+    src = "llvm_passmgr_builder.mli",
+    deps = ["//lib/llvm:Llvm_cmi"]
+)
+
+ocaml_module(
+    name = "Passmgr_builder",
+    struct = "llvm_passmgr_builder.ml",
+    sig    = ":Passmgr_builder_cmi",
+    deps   = ["//lib/llvm:Llvm",
+              "//lib/target:Target",
+              ":passmgr_builder_c"])
+
+cc_library(
+    name = "passmgr_builder_c",
+    srcs = ["passmgr_builder_ocaml.c"],
+    copts = ["-I$(@llvm_c_sdk)/include",
+             "-I$(@ocaml)/lib/sdk",
+             "-I$(@)/lib/llvm"
+             ],
+    deps = ["@llvm_c_sdk//include",
+            "@llvm_c_sdk//lib:passes-libs",
+            "@ocaml//lib/sdk",
+            "//lib/llvm:llvm_c"
+            ],
+    visibility = ["//visibility:public"],
+    toolchains = ["//:repo_paths"])

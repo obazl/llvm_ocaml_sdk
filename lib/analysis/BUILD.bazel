@@ -1,0 +1,41 @@
+load("@rules_ocaml//build:rules.bzl",
+     "ocaml_module",
+     "ocaml_signature")
+
+package(default_visibility=["//visibility:public"])
+
+ocaml_signature(
+    name = "Analysis_cmi",
+    src = "llvm_analysis.mli",
+    opts = ["-w", "-unexpected-docstring"], # 50
+    deps = ["//lib/llvm:Llvm_cmi"]
+)
+
+ocaml_module(
+    name = "Analysis",
+    struct = "llvm_analysis.ml",
+    sig    = "Analysis_cmi",
+    deps   = [
+        "//lib/llvm:Llvm",
+        ":analysis_c"
+    ],
+)
+
+cc_library(
+    name = "analysis_c",
+    srcs = [
+        "analysis_ocaml.c",
+        "//lib/llvm:llvm_ocaml.h",
+    ],
+    copts = [
+        "-I$(@)/lib/llvm",
+        "-I$(@llvm_c_sdk)/include",
+        "-I$(@ocaml)/lib/sdk",
+    ],
+    deps = [
+        "@llvm_c_sdk//include",
+        "@llvm_c_sdk//lib:analysis-libs",
+        "@ocaml//lib/sdk:dbg"
+    ],
+    toolchains = ["//:repo_paths"]
+)

@@ -5,5 +5,5 @@ package(default_visibility=["//visibility:public"])
 ocaml_module(
     name = "Testsuite",
     struct = "Testsuite.ml",
-    deps   = ["//llvm/bitreader:Bitreader",
-              "//llvm/bitwriter:Bitwriter"])
+    deps   = ["//lib/bitreader:Bitreader",
+              "//lib/bitwriter:Bitwriter"])

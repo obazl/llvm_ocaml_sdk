@@ -9,7 +9,8 @@ load(
 )
 
 TEST_OPTS = [
-    # "-g",
+    "-g",
+    # "-runtime-variant", "d",
     "-cclib", "-lm",
     "-cclib", "-lz",
     "-cclib", "-lstdc++",
@@ -22,17 +23,19 @@ TEST_OPTS = [
 test_suite(
     name = "test",
     tests = [
-        ":builds", "clibs",
+        # ":builds", "clibs",
         ":analysis_test",
         ":bitreader_test",
         ":bitwriter_test",
         ":core_test",
         ":debuginfo_test",
+        ":diagnostic_handler_test",
         ":executionengine_test",
         ":ext_exc_test",
         ":ipo_test",
         ":irreader_test",
         ":linker_test",
+        # ":passbuilder_test",
         ":passmgr_builder_test",
         ":scalar_opts_test",
         ":target_test",
@@ -53,7 +56,7 @@ ocaml_test(
 ocaml_module(
     name = "Analysis",
     struct = "analysis.ml",
-    deps   = ["//llvm/analysis:Analysis"],
+    deps   = ["//lib/analysis:Analysis"],
     opts = ["-w", "+A-27-70"],
 )
 
@@ -70,8 +73,8 @@ ocaml_test(
 ocaml_module(
     name = "Bitreader",
     struct = "bitreader.ml",
-    deps   = ["//llvm/bitreader:Bitreader",
-              "//llvm/bitwriter:Bitwriter"])
+    deps   = ["//lib/bitreader:Bitreader",
+              "//lib/bitwriter:Bitwriter"])
 
 ###########
 ocaml_test(
@@ -86,8 +89,8 @@ ocaml_test(
 ocaml_module(
     name = "Bitwriter",
     struct = "bitwriter.ml",
-    deps   = ["//llvm/bitreader:Bitreader",
-              "//llvm/bitwriter:Bitwriter"])
+    deps   = ["//lib/bitreader:Bitreader",
+              "//lib/bitwriter:Bitwriter"])
 
 ###########
 ocaml_test(
@@ -102,8 +105,8 @@ ocaml_test(
 ocaml_module(
     name = "Core",
     struct = "core.ml",
-    deps   = ["//llvm/analysis:Analysis",
-              "//llvm/bitwriter:Bitwriter",
+    deps   = ["//lib/analysis:Analysis",
+              "//lib/bitwriter:Bitwriter",
               "//test/Utils:Testsuite"])
 
 ###########
@@ -119,11 +122,33 @@ ocaml_test(
 ocaml_module(
     name = "Debuginfo",
     struct = "debuginfo.ml",
-    deps   = ["//llvm/all_backends:All_backends",
-              "//llvm/target:Target",
-              "//llvm/analysis:Analysis",
-              "//llvm/debuginfo:Debuginfo",
+    deps   = ["//lib/all_backends:All_backends",
+              "//lib/target:Target",
+              "//lib/analysis:Analysis",
+              "//lib/debuginfo:Debuginfo",
               "//test/Utils:Testsuite"]
+)
+
+###########
+ocaml_test(
+    name = "diagnostic_handler_test",
+    # args = ["bitcode.bc"],
+    main = ":Diagnostic_Handler",
+    opts = TEST_OPTS,
+    toolchains = ["//:repo_paths"],
+    timeout = "short"
+)
+
+ocaml_module(
+    name = "Diagnostic_Handler",
+    struct = "diagnostic_handler.ml",
+    deps   = [
+        # "//lib/all_backends:All_backends",
+        # "//lib/target:Target",
+        # "//lib/analysis:Analysis",
+        # "//lib/diagnostic_handler:Debuginfo",
+        "//test/Utils:Testsuite"
+    ]
 )
 
 ###########
@@ -140,12 +165,12 @@ ocaml_module(
     name = "Executionengine",
     struct = "executionengine.ml",
     deps   = [
-        "//llvm/llvm:Llvm",
-        "//llvm/executionengine:Executionengine",
-        # "//llvm/all_backends:All_backends",
-              "//llvm/target:Target",
-              "//llvm/analysis:Analysis",
-              "//llvm/debuginfo:Debuginfo",
+        "//lib/llvm:Llvm",
+        "//lib/executionengine:Executionengine",
+        # "//lib/all_backends:All_backends",
+              "//lib/target:Target",
+              "//lib/analysis:Analysis",
+              "//lib/debuginfo:Debuginfo",
               "//test/Utils:Testsuite"
     ]
 )
@@ -163,13 +188,13 @@ ocaml_module(
     name = "Ext_exc",
     struct = "ext_exc.ml",
     deps   = [
-        "//llvm/llvm:Llvm",
-        "//llvm/bitreader:Bitreader",
-        "//llvm/executionengine:Executionengine",
+        "//lib/llvm:Llvm",
+        "//lib/bitreader:Bitreader",
+        "//lib/executionengine:Executionengine",
     ]
 )
 
-###########
+
 ocaml_test(
     name = "ipo_test",
     main = ":Ipo",
@@ -182,14 +207,13 @@ ocaml_module(
     name = "Ipo",
     struct = "ipo.ml",
     deps   = [
-        "//llvm/llvm:Llvm",
-        "//llvm/transforms/ipo:Ipo",
-        "//llvm/transforms/passmgr_builder:Passmgr_builder",
-        # "//llvm/bitreader:Bitreader",
-        # "//llvm/executionengine:Executionengine",
+        "//lib/llvm:Llvm",
+        "//lib/transforms/ipo:Ipo",
+        "//lib/transforms/passmgr_builder:Passmgr_builder",
+        # "//lib/bitreader:Bitreader",
+        # "//lib/executionengine:Executionengine",
     ]
 )
-
 
 ###########
 ocaml_test(
@@ -203,8 +227,8 @@ ocaml_test(
 ocaml_module(
     name = "Irreader",
     struct = "irreader.ml",
-    deps   = ["//llvm/llvm:Llvm",
-              "//llvm/irreader:Irreader"])
+    deps   = ["//lib/llvm:Llvm",
+              "//lib/irreader:Irreader"])
 
 ###########
 ocaml_test(
@@ -218,8 +242,26 @@ ocaml_test(
 ocaml_module(
     name = "Linker",
     struct = "linker.ml",
-    deps   = ["//llvm/llvm:Llvm",
-              "//llvm/linker:Linker"])
+    deps   = ["//lib/llvm:Llvm",
+              "//lib/linker:Linker"])
+
+###########
+# ocaml_test(
+#     name = "passbuilder_test",
+#     args = ["bitcode.bc"],
+#     main = ":passbuilder",
+#     opts = TEST_OPTS,
+#     toolchains = ["//:repo_paths"],
+#     timeout = "short"
+# )
+
+# ocaml_module(
+#     name = "passbuilder",
+#     struct = "passbuilder.ml",
+#     deps   = [
+#         "//lib/transforms/passbuilder:passbuilder"
+#     ]
+# )
 
 ###########
 ocaml_test(
@@ -235,7 +277,7 @@ ocaml_module(
     name = "Passmgr_builder",
     struct = "passmgr_builder.ml",
     deps   = [
-        "//llvm/transforms/passmgr_builder:Passmgr_builder"
+        "//lib/transforms/passmgr_builder:Passmgr_builder"
     ]
 )
 
@@ -253,8 +295,8 @@ ocaml_module(
     name = "Scalar_opts",
     struct = "scalar_opts.ml",
     deps   = [
-        "//llvm/transforms/passmgr_builder:Passmgr_builder",
-        "//llvm/transforms/scalar_opts:Scalar_opts"
+        "//lib/transforms/passmgr_builder:Passmgr_builder",
+        "//lib/transforms/scalar_opts:Scalar_opts"
     ]
 )
 
@@ -272,9 +314,9 @@ ocaml_module(
     name = "Target",
     struct = "target.ml",
     deps   = [
-        "//llvm/transforms/passmgr_builder:Passmgr_builder",
-        "//llvm/all_backends:All_backends",
-        "//llvm/target:Target"
+        "//lib/transforms/passmgr_builder:Passmgr_builder",
+        "//lib/all_backends:All_backends",
+        "//lib/target:Target"
     ]
 )
 
@@ -292,9 +334,9 @@ ocaml_module(
     name = "Transform_utils",
     struct = "transform_utils.ml",
     deps   = [
-        # "//llvm/transforms/passmgr_builder:Passmgr_builder",
-        # "//llvm/all_backends:Llvm_all_backends",
-        "//llvm/transforms/utils:Transform_utils"
+        # "//lib/transforms/passmgr_builder:Passmgr_builder",
+        # "//lib/all_backends:Llvm_all_backends",
+        "//lib/transforms/utils:Transform_utils"
     ]
 )
 
@@ -312,9 +354,9 @@ ocaml_module(
     name = "Vectorize",
     struct = "vectorize.ml",
     deps   = [
-        "//llvm/transforms/passmgr_builder:Passmgr_builder",
-        # "//llvm/all_backends:Llvm_all_backends",
-        "//llvm/transforms/vectorize:Vectorize"
+        "//lib/transforms/passmgr_builder:Passmgr_builder",
+        # "//lib/all_backends:Llvm_all_backends",
+        "//lib/transforms/vectorize:Vectorize"
     ]
 )
 
@@ -322,22 +364,22 @@ ocaml_module(
 build_test(
     name = "builds",
     targets = [
-        "//llvm/all_backends:All_backends",
-        "//llvm/analysis:Analysis",
-        # "//llvm/backends:Backend", # not yet
-        "//llvm/bitreader:Bitreader",
-        "//llvm/bitwriter:Bitwriter",
-        "//llvm/debuginfo:Debuginfo",
-        "//llvm/executionengine:Executionengine",
-        "//llvm/irreader:Irreader",
-        "//llvm/linker:Linker",
-        "//llvm/llvm:Llvm",
-        "//llvm/target:Target",
-        "//llvm/transforms/ipo:Ipo",
-        "//llvm/transforms/passmgr_builder:Passmgr_builder",
-        "//llvm/transforms/scalar_opts:Scalar_opts",
-        "//llvm/transforms/utils:Transform_utils",
-        "//llvm/transforms/vectorize:Vectorize",
+        "//lib/all_backends:All_backends",
+        "//lib/analysis:Analysis",
+        # "//lib/backends:Backend", # not yet
+        "//lib/bitreader:Bitreader",
+        "//lib/bitwriter:Bitwriter",
+        "//lib/debuginfo:Debuginfo",
+        "//lib/executionengine:Executionengine",
+        "//lib/irreader:Irreader",
+        "//lib/linker:Linker",
+        "//lib/llvm:Llvm",
+        "//lib/target:Target",
+        "//lib/transforms/ipo:Ipo",
+        "//lib/transforms/passmgr_builder:Passmgr_builder",
+        "//lib/transforms/scalar_opts:Scalar_opts",
+        "//lib/transforms/utils:Transform_utils",
+        "//lib/transforms/vectorize:Vectorize",
         ]
 )
 
@@ -348,21 +390,21 @@ build_test(
 build_test(
     name = "clibs",
     targets = [
-        "//llvm/all_backends:all_backends_c",
-        "//llvm/analysis:analysis_c",
-        "//llvm/backends:backend_c",
-        "//llvm/bitreader:bitreader_c",
-        "//llvm/bitwriter:bitwriter_c",
-        "//llvm/debuginfo:debuginfo_c",
-        "//llvm/executionengine:executionengine_c",
-        "//llvm/irreader:irreader_c",
-        "//llvm/linker:linker_c",
-        "//llvm/llvm:llvm_c",
-        "//llvm/target:target_c",
-        "//llvm/transforms/ipo:ipo_c",
-        "//llvm/transforms/passmgr_builder:passmgr_builder_c",
-        "//llvm/transforms/scalar_opts:scalar_opts_c",
-        "//llvm/transforms/utils:transform_utils_c",
-        "//llvm/transforms/vectorize:vectorize_c",
+        "//lib/all_backends:all_backends_c",
+        "//lib/analysis:analysis_c",
+        "//lib/backends:backend_c",
+        "//lib/bitreader:bitreader_c",
+        "//lib/bitwriter:bitwriter_c",
+        "//lib/debuginfo:debuginfo_c",
+        "//lib/executionengine:executionengine_c",
+        "//lib/irreader:irreader_c",
+        "//lib/linker:linker_c",
+        "//lib/llvm:llvm_c",
+        "//lib/target:target_c",
+        "//lib/transforms/ipo:ipo_c",
+        "//lib/transforms/passmgr_builder:passmgr_builder_c",
+        "//lib/transforms/scalar_opts:scalar_opts_c",
+        "//lib/transforms/utils:transform_utils_c",
+        "//lib/transforms/vectorize:vectorize_c",
         ]
 )
