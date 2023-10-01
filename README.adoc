@@ -7,7 +7,9 @@ build of the bindings.
 This is not a fork; the source in this repo was _copied_ from the
 link:https://github.com/llvm/llvm-project/tree/main/llvm/bindings/ocaml[llvm-project],
 so it is not kept up to date. The subdirectories of
-`llvm/bindings/ocaml` are under `src/`.
+`llvm/bindings/ocaml` are under `lib/`.
+
+See branch `llvm/15.0.7` for the most recent code.
 
 NOTE: Status as of Sept 22, 2023: each subdir in `src/` has a
 `BUILD.bazel` file; most targets build on MacOS 13.5.2. Not tested on
@@ -18,26 +20,6 @@ development. I expect to publish the stuff in the next few weeks, at
 which point I'll add more detailed information here; until then,
 you'll have to settle for reading the (Bazel) code, which fortunately
 is very simple.
-
-== notes
-
-The OCaml module in `src/backends` does not build, because it depends
-on CMake `configure_file` processing that I have not ported yet.
-
-The llvm toolchain
-(link:https://github.com/grailbio/bazel-toolchain[grailbio/bazel-toolchain])
-works automagically - no need to download, install, configure. Bazel
-handles all that automatically.
-
-However, it did not work out of the box for this project, because it
-is C++-centric. That is, Bazel made it available, but it is not
-configured for C development. So I had to tweak it to expose the C
-headers in `llvm/include/llvm-c`; fortunately this was very simple
-(though admittedly it would be a show-stopper for somebody unfamiliar
-with Bazel).
-
-The META stuff is ignored. That's all about OPAM installation, which
-will be handled by Bazel in its own way. For now the goal is just to build the stuff.
 
 == testing
 
